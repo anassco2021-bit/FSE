@@ -126,11 +126,11 @@
 
 // رابط تطبيق الويب (Apps Script). اتركه فارغًا لتعمل الصفحة محليًّا فقط
 // وتُصدِّر النتائج بملف CSV.
-const ENDPOINT = "";
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbx7EiUQPk4r1godQFCYL4sF4D69WW-2B4Um-z9MQEoQhleCvQkSO2Rhx87fl42zP-xXgg/exec";
 
 // رمز بسيط يرفض به Code.gs الطلبات العشوائية. ليس سرًّا؛ هو مجرد حاجز.
 // يجب أن يطابق قيمة TOKEN في Code.gs.
-const TOKEN = "CHANGE-ME";
+const TOKEN = "fse-k7q2-2026";
 
 // هل يظهر زر الاستماع؟ في القياس القبلي قد يكشف النطق معنى الكلمة،
 // فقرّر قبل التطبيق. ويختفي الزر تلقائيًّا إن لم يكن على الجهاز صوت عربي.
@@ -201,7 +201,7 @@ $("go").addEventListener("click", () => {
   const code = $("code").value.trim().toUpperCase();
   const group = $("group").value.trim().toUpperCase();
   // رمز لا اسم: أحرف لاتينية وأرقام وشرطة فقط، ولا علامة @ (بريد) ولا مسافات
-  if (!/^[A-Z0-9-]{2,12}$/.test(code) || (group && !/^[A-Z0-9-]{1,8}$/.test(group))) {
+  if (!/^[A-Z0-9][A-Z0-9-]{1,11}$/.test(code) || (group && !/^[A-Z0-9][A-Z0-9-]{0,7}$/.test(group))) {
     const e = $("start-err");
     e.textContent = "اكتب أحرفًا لاتينية وأرقامًا وشرطة «-» فقط. لا تكتب اسمك ولا بريدك.";
     e.hidden = false; return;
