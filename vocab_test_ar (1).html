@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مقياس معرفة المفردات</title>
+<style>
+  :root { --ink:#1b2630; --ink2:#5b6773; --line:#dde3e7; --accent:#0b6b5f; --accent-soft:#eaf3f1; --bg:#f6f7f8; }
+  * { box-sizing:border-box; }
+  html { height:100%; }
+  body { margin:0; min-height:100%; min-height:100dvh; display:flex; padding:20px 16px; background:var(--bg); color:var(--ink);
+         font:18px/1.75 "Noto Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  /* الوسط أفقيًّا وعموديًّا؛ وإن طالت الشاشة عن الجهاز فالصفحة تُمرَّر بلا اقتطاع */
+  main { margin:auto; width:100%; max-width:460px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:28px 24px; }
+  h1 { font-size:23px; font-weight:700; margin:0 0 4px; line-height:1.5; }
+  h2 { font-size:15px; font-weight:700; margin:20px 0 6px; color:var(--ink2); }
+  p { margin:0 0 10px; }
+  .muted { color:var(--ink2); font-size:15.5px; line-height:1.7; }
+  .tag { font-size:14px; color:var(--accent); font-weight:600; letter-spacing:0; }
+  .en { direction:ltr; unicode-bidi:isolate; }
+  ul.plain { margin:0 0 6px; padding-inline-start:20px; } ul.plain li { margin-bottom:4px; }
+  label { display:block; font-weight:600; font-size:16px; margin:16px 0 4px; }
+  input[type=text] { width:100%; font:inherit; padding:11px 14px; border:1.5px solid var(--line); border-radius:10px; direction:ltr; text-align:left; background:#fff; }
+  input[type=text]:focus, button:focus-visible { outline:3px solid #9fd2c9; outline-offset:2px; }
+  .check { display:flex; gap:10px; align-items:flex-start; margin:18px 0 14px; font-weight:400; font-size:16px; line-height:1.65; }
+  .check input { width:20px; height:20px; margin-top:5px; flex:none; accent-color:var(--accent); }
+  button { font:inherit; cursor:pointer; }
+  .primary { width:100%; background:var(--accent); color:#fff; border:0; border-radius:10px; padding:13px; font-weight:700; min-height:48px; }
+  .primary:disabled { background:#a9bdb9; cursor:not-allowed; }
+  .link { background:none; border:0; color:var(--ink2); padding:8px 4px; min-height:40px; font-size:15px; text-decoration:underline; text-underline-offset:3px; }
+  .link:disabled { opacity:.35; cursor:not-allowed; text-decoration:none; }
+  .ghost { background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:9px 18px; min-height:42px; color:var(--ink); font-size:16px; }
+
+  /* الأسئلة */
+  .head { display:flex; justify-content:space-between; align-items:baseline; font-size:15px; color:var(--ink2); }
+  .rail { height:3px; background:#e6ebee; border-radius:3px; margin:10px 0 26px; overflow:hidden; }
+  .rail > i { display:block; height:100%; width:0; background:var(--accent); transition:width .2s; }
+  .stage { text-align:center; min-height:150px; display:flex; flex-direction:column; justify-content:center; }
+  .word { font-family:"Noto Naskh Arabic","Amiri","Traditional Arabic",serif; font-size:58px; font-weight:700; line-height:1.45; margin:0; }
+  .tr { color:var(--ink2); font-size:16px; margin-top:2px; }
+  .practice { display:inline-block; align-self:center; background:#f1f3f5; color:var(--ink2); font-size:14px; padding:1px 12px; border-radius:20px; margin-bottom:6px; }
+  .opts { display:grid; gap:9px; margin-top:20px; }
+  .opt { display:flex; gap:12px; align-items:center; width:100%; text-align:start; background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:9px 12px; min-height:58px; }
+  .opt:hover { border-color:#9fb4b0; }
+  .opt.sel { border-color:var(--accent); background:var(--accent-soft); }
+  .opt .n { flex:none; width:28px; height:28px; border-radius:50%; border:1.5px solid #c6cfd4; display:grid; place-items:center; font-weight:700; font-size:15px; color:var(--ink2); }
+  .opt.sel .n { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .opt .t { flex:1; } .opt .t b { font-weight:600; display:block; line-height:1.5; font-size:17px; }
+  .opt .t small { display:block; color:var(--ink2); font-size:13px; line-height:1.4; text-align:left; }
+  .foot { display:flex; justify-content:space-between; align-items:center; margin-top:14px; min-height:40px; }
+  .hint { font-size:13.5px; color:#7a8691; }
+  .note { border-radius:10px; padding:10px 14px; margin:14px 0; font-size:16px; }
+  .ok { background:var(--accent-soft); color:#0a574d; } .warn { background:#f7f1e3; color:#6b4a0c; } .err { background:#f8ebe7; color:#8f3220; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; } .row > button { flex:1; }
+  .src { margin-top:18px; padding-top:12px; border-top:1px solid var(--line); font-size:13px; color:#7a8691; line-height:1.6; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+
+<!-- ============ 1. التعليمات والموافقة ============ -->
+<section id="s-start" class="card">
+  <div class="tag" id="test-badge">القياس القبلي</div>
+  <h1>مقياس معرفة المفردات</h1>
+  <p class="muted">تقدير ذاتي لمعرفتك بعشر كلمات عربية، ويستغرق نحو دقيقتين.</p>
+
+  <h2>التعليمات</h2>
+  <ul class="plain muted">
+    <li>تظهر كلمة واحدة في كل شاشة. اختر الخيار الأقرب إلى معرفتك <b>الحالية</b> بها.</li>
+    <li>لا توجد إجابة صحيحة أو خاطئة، ولا تُحسب لك درجة.</li>
+    <li>أجب دون قاموس ودون هاتف ودون مساعدة من أحد.</li>
+    <li>المشاركة طوعية، ويمكنك التوقف في أي لحظة بإغلاق الصفحة.</li>
+  </ul>
+
+  <label for="code">الرمز <span class="muted" style="font-weight:400">(كما أعطاك إياه المدرّب)</span></label>
+  <input id="code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="P-014">
+  <p class="muted" style="margin:6px 0 0">لا تكتب اسمك ولا بريدك الإلكتروني.</p>
+
+  <label for="group">المجموعة <span class="muted" style="font-weight:400">(اختياري)</span></label>
+  <input id="group" type="text" autocomplete="off" autocapitalize="characters" maxlength="8" placeholder="A1">
+
+  <label class="check"><input id="consent" type="checkbox">
+    <span>قرأتُ التعليمات، وأوافق على استعمال إجاباتي المرمَّزة في هذا النشاط.</span></label>
+
+  <div id="start-err" class="note err" role="alert" hidden></div>
+  <button id="go" class="primary" disabled>متابعة</button>
+  <div class="src">مقياس تقدير ذاتي من أربعة مستويات، مكيَّف عن <span class="en">Wesche &amp; Paribakht (1996)</span>.</div>
+</section>
+
+<!-- ============ 2. البنود ============ -->
+<section id="s-q" class="card" hidden>
+  <div class="head"><span id="pos" dir="ltr">1 / 10</span><span id="kind">الكلمة</span></div>
+  <div class="rail"><i id="fill"></i></div>
+  <div class="stage">
+    <span class="practice" id="practice" hidden>بند تدريب · لا تُسجَّل إجابته</span>
+    <div class="word" id="word" lang="ar"></div>
+    <div class="tr" id="tr"></div>
+  </div>
+  <div class="opts" id="opts" role="group" aria-label="ما مدى معرفتك بهذه الكلمة؟"></div>
+  <div class="foot">
+    <button id="back" class="link" type="button">السابقة</button>
+    <button id="listen" class="ghost" type="button" aria-label="استمع إلى الكلمة" hidden>استمع</button>
+    <span class="hint">المفاتيح 1–4</span>
+  </div>
+</section>
+
+<!-- ============ 3. النهاية ============ -->
+<section id="s-end" class="card" hidden>
+  <h1>شكرًا لمشاركتك</h1>
+  <p class="muted">انتهى القياس، ولا حاجة إلى أي إجراء آخر منك.</p>
+  <div id="send-status" class="note" role="status" aria-live="polite"></div>
+  <div class="row">
+    <button id="retry" class="ghost" type="button" hidden>أعد الإرسال</button>
+    <button id="csv" class="ghost" type="button">نزّل الإجابات (CSV)</button>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ================================================================
+   إعدادات الورشة — هذا هو الجزء الوحيد الذي يُعدَّل
+   ================================================================ */
+
+// رابط تطبيق الويب (Apps Script). اتركه فارغًا لتعمل الصفحة محليًّا فقط
+// وتُصدِّر النتائج بملف CSV.
+const ENDPOINT = "";
+
+// رمز بسيط يرفض به Code.gs الطلبات العشوائية. ليس سرًّا؛ هو مجرد حاجز.
+// يجب أن يطابق قيمة TOKEN في Code.gs.
+const TOKEN = "CHANGE-ME";
+
+// هل يظهر زر الاستماع؟ في القياس القبلي قد يكشف النطق معنى الكلمة،
+// فقرّر قبل التطبيق. ويختفي الزر تلقائيًّا إن لم يكن على الجهاز صوت عربي.
+const SHOW_LISTEN = true;
+
+// بند تدريب غير مسجَّل، يتعرّف به المشارك على الشاشة قبل البنود الفعلية.
+// استعمل كلمة لا تدخل في قائمة الدراسة.
+const PRACTICE = { id: "practice", word: "كِتَاب", tr: "kitāb", pos: "اسم" };
+
+// قائمة الكلمات (8–12). الـ id: حروف لاتينية صغيرة بلا مسافات ولا يتكرر.
+// word: الكلمة مشكولة · tr: النقحرة (اختيارية) · pos: النوع.
+// ترتيب العرض ثابت لكل المشاركين وفي القياسين.
+const WORDS = [
+  { id: "qahwa",   word: "قَهْوَة",   tr: "qahwa",   pos: "اسم" },
+  { id: "halib",   word: "حَلِيب",   tr: "ḥalīb",   pos: "اسم" },
+  { id: "fatura",  word: "فَاتُورَة", tr: "fātūra",  pos: "اسم" },
+  { id: "nadil",   word: "نَادِل",   tr: "nādil",   pos: "اسم" },
+  { id: "sukkar",  word: "سُكَّر",   tr: "sukkar",  pos: "اسم" },
+  { id: "bitaqa",  word: "بِطَاقَة", tr: "biṭāqa",  pos: "اسم" },
+  { id: "zawiya",  word: "زَاوِيَة", tr: "zāwiya",  pos: "اسم" },
+  { id: "nafidha", word: "نَافِذَة", tr: "nāfidha", pos: "اسم" },
+  { id: "talaba",  word: "طَلَبَ",   tr: "ṭalaba",  pos: "فعل" },
+  { id: "dafaa",   word: "دَفَعَ",   tr: "dafaʿa",  pos: "فعل" }
+];
+
+// مستويات المعرفة الأربعة — لا تُغيَّر نصًّا ولا ترتيبًا (المقياس نفسه قبليًّا وبعديًّا).
+const LEVELS = [
+  { v: 1, ar: "لا أعرف هذه الكلمة",              en: "I don't know this word" },
+  { v: 2, ar: "رأيتها لكنني لا أعرف معناها",     en: "I have seen it, but I don't know its meaning" },
+  { v: 3, ar: "أعرف معناها",                      en: "I know its meaning" },
+  { v: 4, ar: "أستطيع استعمالها في جملة",         en: "I can use it in a sentence" }
+];
+
+/* ================================================================
+   المنطق
+   ================================================================ */
+const $ = (id) => document.getElementById(id);
+const TEST = new URLSearchParams(location.search).get("test") === "post" ? "post" : "pre";
+const SEQ = [Object.assign({ practice: true }, PRACTICE)].concat(WORDS);   // 0 = التدريب
+const N = WORDS.length;
+const state = { code: "", group: "", i: 0, answers: [], shownAt: 0, locked: false, events: [] };
+const store = {
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+$("test-badge").textContent = TEST === "post" ? "القياس البعدي" : "القياس القبلي";
+document.title = "مقياس معرفة المفردات — " + (TEST === "post" ? "بعدي" : "قبلي");
+
+/* زر الاستماع: يظهر فقط إن وُجد صوت عربي على الجهاز (الأصوات تُحمَّل بعد لحظة) */
+function updateListen() {
+  let ok = false;
+  try {
+    ok = SHOW_LISTEN && "speechSynthesis" in window &&
+      speechSynthesis.getVoices().some((v) => /^ar/i.test(v.lang));
+  } catch (e) {}
+  $("listen").hidden = !ok;
+}
+updateListen();
+try { speechSynthesis.addEventListener("voiceschanged", updateListen); } catch (e) {}
+
+/* --- التعليمات --- */
+function checkStart() { $("go").disabled = !($("code").value.trim() && $("consent").checked); }
+["code", "group", "consent"].forEach((id) => $(id).addEventListener("input", checkStart));
+$("consent").addEventListener("change", checkStart);
+
+$("go").addEventListener("click", () => {
+  const code = $("code").value.trim().toUpperCase();
+  const group = $("group").value.trim().toUpperCase();
+  // رمز لا اسم: أحرف لاتينية وأرقام وشرطة فقط، ولا علامة @ (بريد) ولا مسافات
+  if (!/^[A-Z0-9-]{2,12}$/.test(code) || (group && !/^[A-Z0-9-]{1,8}$/.test(group))) {
+    const e = $("start-err");
+    e.textContent = "اكتب أحرفًا لاتينية وأرقامًا وشرطة «-» فقط. لا تكتب اسمك ولا بريدك.";
+    e.hidden = false; return;
+  }
+  Object.assign(state, { code, group, i: 0, answers: new Array(N).fill(null) });
+  $("s-start").hidden = true; $("s-q").hidden = false;
+  show();
+});
+
+/* --- البنود --- */
+function buildOptions() {
+  $("opts").innerHTML = "";
+  LEVELS.forEach((L) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "opt"; b.dataset.v = L.v;
+    b.innerHTML = '<span class="n"></span><span class="t"><b></b><small class="en" lang="en" dir="ltr"></small></span>';
+    b.querySelector(".n").textContent = L.v;
+    b.querySelector("b").textContent = L.ar;
+    b.querySelector("small").textContent = L.en;
+    b.addEventListener("click", () => choose(L.v));
+    $("opts").appendChild(b);
+  });
+}
+buildOptions();
+
+function show() {
+  const w = SEQ[state.i];
+  const real = !w.practice;
+  $("practice").hidden = real;
+  $("pos").textContent = real ? state.i + " / " + N : "—";
+  $("kind").textContent = real ? "الكلمة" : "تدريب";
+  $("fill").style.width = (real ? (state.i - 1) / N * 100 : 0) + "%";
+  $("word").textContent = w.word;
+  $("tr").innerHTML = "";
+  if (w.tr) { const s = document.createElement("span"); s.className = "en"; s.textContent = w.tr; $("tr").appendChild(s); }
+  if (w.pos) $("tr").appendChild(document.createTextNode((w.tr ? " · " : "") + w.pos));
+  $("back").disabled = state.i <= 1;                 // لا رجوع إلى بند التدريب
+  const prev = real ? state.answers[state.i - 1] : null;
+  document.querySelectorAll(".opt").forEach((b) => b.classList.toggle("sel", !!prev && +b.dataset.v === prev.rating));
+  state.shownAt = performance.now();
+  state.locked = false;
+}
+
+function choose(v) {
+  if (state.locked) return;
+  state.locked = true;
+  const w = SEQ[state.i];
+  if (!w.practice) {
+    // آخر إجابة تحلّ محلّ السابقة إن رجع المشارك (Responses يحفظ آخر إجابة لكل كلمة)
+    state.answers[state.i - 1] = {
+      ts: new Date().toISOString(), code: state.code, group: state.group, test: TEST,
+      word_id: w.id, rating: v, rt_ms: Math.round(performance.now() - state.shownAt)
+    };
+  }
+  document.querySelectorAll(".opt").forEach((b) => b.classList.toggle("sel", +b.dataset.v === v));
+  setTimeout(() => {
+    if (state.i + 1 < SEQ.length) { state.i++; show(); } else finish();
+  }, 160);
+}
+
+$("back").addEventListener("click", () => { if (state.i > 1) { state.i--; show(); } });
+$("listen").addEventListener("click", () => {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(SEQ[state.i].word);
+    u.lang = "ar-SA"; u.rate = 0.8;
+    const v = speechSynthesis.getVoices().find((x) => /^ar/i.test(x.lang));
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+});
+document.addEventListener("keydown", (e) => {
+  if ($("s-q").hidden || e.target.tagName === "INPUT" || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key >= "1" && e.key <= "4") choose(+e.key);
+  else if (e.key === "Backspace" || e.key === "ArrowRight") { e.preventDefault(); $("back").click(); } // في RTL السهم الأيمن = رجوع
+});
+
+/* --- النهاية والإرسال --- */
+function finish() {
+  state.events = state.answers.filter(Boolean);
+  $("fill").style.width = "100%";
+  $("s-q").hidden = true; $("s-end").hidden = false;
+  send();
+}
+
+function setStatus(cls, msg) { const s = $("send-status"); s.className = "note " + cls; s.textContent = msg; }
+
+async function send() {
+  const key = "vocab_pending_" + TEST + "_" + state.code;
+  if (!ENDPOINT) {
+    setStatus("warn", "لم يُضبط رابط الاستقبال (ENDPOINT)، فتبقى إجاباتك على هذا الجهاز. نزّل ملف CSV وسلّمه للمدرّب.");
+    return;
+  }
+  $("retry").hidden = true;
+  setStatus("ok", "جارٍ الإرسال…");
+  try {
+    // no-cors: المتصفح لا يسمح بقراءة الرد، فنعدّ الإرسال «غير مؤكَّد» ونتحقق من الجدول يدويًّا
+    await fetch(ENDPOINT, { method: "POST", mode: "no-cors", body: JSON.stringify({ token: TOKEN, events: state.events }) });
+    store.del(key);
+    setStatus("ok", "أُرسلت إجاباتك. سيتحقق المدرّب من وصولها.");
+  } catch (e) {
+    store.set(key, JSON.stringify(state.events));
+    setStatus("err", "تعذّر الإرسال (لا اتصال؟). إجاباتك محفوظة على هذا الجهاز. اضغط «أعد الإرسال».");
+    $("retry").hidden = false;
+  }
+}
+$("retry").addEventListener("click", send);
+
+$("csv").addEventListener("click", () => {
+  const cols = ["ts", "code", "group", "test", "word_id", "rating", "rt_ms"];
+  const esc = (v) => {
+    let s = String(v ?? "");
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;           // لا صيغ خبيثة في Excel
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const csv = [cols.join(",")].concat(state.events.map((e) => cols.map((c) => esc(e[c])).join(","))).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+  a.download = "vocab_" + TEST + "_" + state.code + ".csv";
+  document.body.appendChild(a); a.click(); a.remove();
+});
+</script>
+</body>
+</html>
